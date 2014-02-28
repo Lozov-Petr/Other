@@ -29,8 +29,11 @@ let converter (code : string) n =
 
     let incr         = sprintf "%s%s<<<[->>+<<]%s" iterIncr (repeat partIncr <| n-2) (right length)
     let decr         = sprintf "%s%s<<<[->>-<<]%s" iterDecr (repeat partDecr <| n-2) (right length)
-    let openBracket  = sprintf "%s%s<<<[->>%s<%s<%s]%s-[+"  iterBracket (repeat partBracket <| n-2) copy isZero (shiftResR length) (right length)
-    let closeBracket = sprintf "%s%s<<<[->>%s<%s<%s]%s-]"   iterBracket (repeat partBracket <| n-2) copy isZero (shiftResR length) (right length)
+    
+    let openBracket  = sprintf "%s%s<<<[->>%s<%s<%s]%s-[+"  iterBracket (repeat partBracket <| n-2) 
+                                                            copy isZero (shiftResR length) (right length)
+    let closeBracket = sprintf "%s%s<<<[->>%s<%s<%s]%s-]"   iterBracket (repeat partBracket <| n-2) 
+                                                            copy isZero (shiftResR length) (right length)
 
     let read         = sprintf "%s%s,<<" (left <| 3*n-5) (repeat ",>>>" <| n-1)
     let write        = sprintf "%s%s.<<" (left <| 3*n-5) (repeat ".>>>" <| n-1)
@@ -51,10 +54,15 @@ let converter (code : string) n =
                         | '\n' -> ""
                         | '\t' -> ""
                         | _    -> failwithf "Incorrect char %c." c
+
+    let rec optimization (s : string) =
+        let newS = s.Replace("><","").Replace("<>","")
+        if newS.Length = s.Length then s else optimization newS
                         
     code.ToCharArray()
     |> Array.map convertChar
     |> String.Concat
+    |> optimization
     
 [<EntryPoint>]
 let main _ =
